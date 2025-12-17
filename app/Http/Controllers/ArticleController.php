@@ -38,6 +38,7 @@ class ArticleController extends Controller
         ]);
 
         $article->update($request->only(['title', 'content']));
+        
 
         return response()->json($article);
     }
