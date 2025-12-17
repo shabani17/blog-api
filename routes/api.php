@@ -32,3 +32,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Comments - Public
 Route::get('/articles/{article}/comments', [CommentController::class, 'index']);
+Route::get('/comments/{comment}', [CommentController::class, 'show']);

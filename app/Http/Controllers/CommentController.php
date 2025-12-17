@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
+use App\Http\Resources\CommentResource;
+use App\Models\Article;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,10 +14,10 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class CommentController extends Controller
 {
     use AuthorizesRequests;
-    public function index($articleId)
+    public function index(Article $article)
     {
-        $comments = Comment::where('article_id', $articleId)->with('user')->get();
-        return response()->json($comments);
+        $comments = $article->comments()->with('user')->latest()->get();
+        return CommentResource::collection($comments);
     }
 
     public function store(StoreCommentRequest $request, $articleId)
@@ -26,7 +28,7 @@ class CommentController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        return response()->json($comment, 201);
+        return new CommentResource($comment);
     }
 
        public function update(UpdateCommentRequest $request, Comment $comment)
@@ -36,7 +38,7 @@ class CommentController extends Controller
             'body' => $request->body,
         ]);
 
-        return response()->json($comment, 200);
+        return new CommentResource($comment);
     }
 
 
@@ -54,6 +56,6 @@ class CommentController extends Controller
     public function show(Comment $comment)
     {
         $comment->load('user', 'article');
-        return response()->json($comment);
+        return new CommentResource($comment);
     }
 }

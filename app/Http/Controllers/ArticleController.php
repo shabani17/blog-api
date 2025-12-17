@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreArticleRequest;
 use App\Http\Requests\UpdateArticleRequest;
+use App\Http\Resources\ArticleResource;
 use Illuminate\Http\Request;
 use App\Models\Article;
 use Illuminate\Support\Facades\Auth;
@@ -19,9 +20,8 @@ class ArticleController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        return response()->json($article, 201);
+        return new ArticleResource($article);
     }
-
     
     public function update(UpdateArticleRequest $request, Article $article)
     {
@@ -33,7 +33,7 @@ class ArticleController extends Controller
         $article->update($request->only(['title', 'content']));
         
 
-        return response()->json($article);
+        return new ArticleResource($article);
     }
 
     
@@ -50,14 +50,14 @@ class ArticleController extends Controller
     
     public function index()
     {
-        $articles = Article::with('user')->get();
-        return response()->json($articles);
+        $articles = Article::with('user')->latest()->get();
+        return ArticleResource::collection($articles);
     }
 
     
     public function show(Article $article)
     {
-        $article->load('comments.user');
-        return response()->json($article);
+        $article->load('user','comments.user');
+        return new ArticleResource($article);
     }
 }
