@@ -49,3 +49,30 @@ A simple RESTful API for a blog platform that allows users to register, log in, 
     ```bash
     git clone https://github.com/shabani17/blog-api.git
     ```
+2. Install dependencies:
+    ```bash
+    composer install
+    ```
+3. Copy `.env.example` to `.env` and configure your database and other settings:
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
+4. Run migrations:
+    ```bash
+    php artisan migrate
+    ```
+5. Start the local server:
+    ```bash
+    php artisan serve
+    ```
+
+## Running Tests
+
+This project includes automated feature and unit tests to ensure the API works correctly. All tests are located in `tests/Feature` and `tests/Unit`.
+
+Run all tests using:
+
+```bash
+php artisan test
+```
