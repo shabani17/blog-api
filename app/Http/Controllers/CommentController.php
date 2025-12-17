@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCommentRequest;
+use App\Http\Requests\UpdateCommentRequest;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,12 +18,8 @@ class CommentController extends Controller
         return response()->json($comments);
     }
 
-    public function store(Request $request, $articleId)
+    public function store(StoreCommentRequest $request, $articleId)
     {
-        $request->validate([
-            'body' => 'required|string',
-        ]);
-
         $comment = Comment::create([
             'article_id' => $articleId,
             'body' => $request->body,
@@ -31,14 +29,9 @@ class CommentController extends Controller
         return response()->json($comment, 201);
     }
 
-       public function update(Request $request, Comment $comment)
+       public function update(UpdateCommentRequest $request, Comment $comment)
     {
         $this->authorize('update', $comment); 
-
-        $request->validate([
-            'body' => 'required|string',
-        ]);
-
         $comment->update([
             'body' => $request->body,
         ]);

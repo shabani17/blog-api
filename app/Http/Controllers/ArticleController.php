@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreArticleRequest;
+use App\Http\Requests\UpdateArticleRequest;
 use Illuminate\Http\Request;
 use App\Models\Article;
 use Illuminate\Support\Facades\Auth;
@@ -9,13 +11,8 @@ use Illuminate\Support\Facades\Auth;
 class ArticleController extends Controller
 {
     
-    public function store(Request $request)
+    public function store(StoreArticleRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-        ]);
-
         $article = Article::create([
             'title' => $request->title,
             'content' => $request->content,
@@ -26,16 +23,12 @@ class ArticleController extends Controller
     }
 
     
-    public function update(Request $request, Article $article)
+    public function update(UpdateArticleRequest $request, Article $article)
     {
         if ($article->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'content' => 'sometimes|required|string',
-        ]);
 
         $article->update($request->only(['title', 'content']));
         
