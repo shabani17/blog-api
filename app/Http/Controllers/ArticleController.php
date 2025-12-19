@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DeleteArticleRequest;
 use App\Http\Requests\StoreArticleRequest;
 use App\Http\Requests\UpdateArticleRequest;
 use App\Http\Resources\ArticleResource;
 use Illuminate\Http\Request;
 use App\Models\Article;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 
 class ArticleController extends Controller
 {
-    
+    use AuthorizesRequests;
     public function store(StoreArticleRequest $request)
     {
         $article = Article::create([
@@ -20,32 +22,25 @@ class ArticleController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        return new ArticleResource($article);
+        return (new ArticleResource($article))->response()->setStatusCode(201);
     }
     
     public function update(UpdateArticleRequest $request, Article $article)
     {
-        if ($article->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('update', $article);
+        $article->update($request->validated());
 
-
-        $article->update($request->only(['title', 'content']));
-        
-
-        return new ArticleResource($article);
+        return (new ArticleResource($article))->response()->setStatusCode(200);
     }
 
     
-    public function destroy(Article $article)
+    public function destroy(DeleteArticleRequest $request ,Article $article)
     {
-        if ($article->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('delete', $article);
 
         $article->delete();
-        return response()->json(['message' => 'Article deleted']);
-    }
+        return response()->noContent();
+        }
 
     
     public function index()

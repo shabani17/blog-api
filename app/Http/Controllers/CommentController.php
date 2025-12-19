@@ -28,7 +28,7 @@ class CommentController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        return new CommentResource($comment);
+        return (new CommentResource($comment))->response()->setStatusCode(201);
     }
 
        public function update(UpdateCommentRequest $request, Comment $comment)
@@ -38,7 +38,7 @@ class CommentController extends Controller
             'body' => $request->body,
         ]);
 
-        return new CommentResource($comment);
+        return (new CommentResource($comment))->response()->setStatusCode(200);
     }
 
 
