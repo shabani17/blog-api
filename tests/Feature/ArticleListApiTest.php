@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Article;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-class ArticleTest extends TestCase
+class ArticleListApiTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -18,6 +18,6 @@ class ArticleTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data'); 
     }
 }

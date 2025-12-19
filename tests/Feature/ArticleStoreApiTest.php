@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class StoreArticleTest extends TestCase
+class ArticleStoreApiTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -31,5 +31,17 @@ class StoreArticleTest extends TestCase
         $this->assertDatabaseHas('articles', [
             'title' => 'Test Article',
         ]);
+    }
+
+    public function test_guest_cannot_create_article()
+    {
+        $payload = [
+            'title' => 'Test Article',
+            'content' => 'This is a test body',
+        ];
+
+        $response = $this->postJson('/api/articles', $payload);
+
+        $response->assertStatus(401); // Unauthorized
     }
 }

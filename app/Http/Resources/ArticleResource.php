@@ -22,6 +22,7 @@ class ArticleResource extends JsonResource
                 'id'=> $this->user->id ,
                 'name'=> $this->user->name ,
                 ],
+            'comments'=> CommentResource::collection($this->comments),
             'created_at'=> $this->created_at
         ];
     }
