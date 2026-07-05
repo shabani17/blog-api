@@ -3,19 +3,17 @@
 namespace App\Http\Requests;
 
 use App\Models\Article;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateArticleRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $article = $this->route('article');
-
-        if (! $article) {
+        if(!Gate::authorize('update', $this->route('article'))){
             return false;
         }
-
-        return $this->user()->id === $article->user_id;
+        return true;
     }
 
     public function rules(): array

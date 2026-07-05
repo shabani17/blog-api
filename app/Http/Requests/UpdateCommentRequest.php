@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCommentRequest extends FormRequest
@@ -11,6 +12,9 @@ class UpdateCommentRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        if(!Gate::authorize('update', $this->route('comment'))){
+            return false;
+        }
         return true;
     }
 
@@ -22,7 +26,7 @@ class UpdateCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'body' => 'required|string',
+            'body' => 'required|string' ,
         ];
     }
 }

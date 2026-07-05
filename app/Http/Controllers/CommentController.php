@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCommentRequest;
-use App\Http\Requests\UpdateCommentRequest;
-use App\Http\Resources\CommentResource;
+use App\Http\Requests\DeleteCommentRequest;
 use App\Models\Article;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use App\Http\Resources\CommentResource;
+use App\Http\Requests\StoreCommentRequest;
+use App\Http\Requests\UpdateCommentRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CommentController extends Controller
@@ -33,7 +35,6 @@ class CommentController extends Controller
 
        public function update(UpdateCommentRequest $request, Comment $comment)
     {
-        $this->authorize('update', $comment); 
         $comment->update([
             'body' => $request->body,
         ]);
@@ -42,10 +43,8 @@ class CommentController extends Controller
     }
 
 
-    public function destroy(Comment $comment)
+    public function destroy(DeleteCommentRequest $request , Comment $comment)
     {
-        $this->authorize('delete', $comment); 
-
         $comment->delete();
 
         return response()->json(['message' => 'Comment deleted successfully.'], 200);

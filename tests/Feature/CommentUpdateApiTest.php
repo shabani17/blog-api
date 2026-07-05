@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Comment;
 use App\Models\User;
-use App\Models\Article;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,61 +14,41 @@ class CommentUpdateApiTest extends TestCase
     public function test_owner_can_update_comment()
     {
         $user = User::factory()->create();
-        $article = Article::factory()->create(['user_id' => $user->id]);
-        $comment = Comment::factory()->create([
-            'article_id' => $article->id,
-            'user_id' => $user->id,
-            'body' => 'Original comment',
-        ]);
+        $comment = Comment::factory()->create(['user_id' => $user->id]);
 
-        $payload = ['body' => 'Updated comment'];
+        $payload = ['body' => 'Updated comment content'];
 
-        $response = $this
-            ->actingAs($user)
-            ->putJson("/api/comments/{$comment->id}", $payload);
+        $response = $this->actingAs($user)->putJson("/api/comments/{$comment->id}", $payload);
 
         $response->assertStatus(200)
-                 ->assertJsonPath('data.body', 'Updated comment');
+                 ->assertJsonPath('data.body', 'Updated comment content');
 
-        $this->assertDatabaseHas('comments', [
-            'id' => $comment->id,
-            'body' => 'Updated comment',
-        ]);
+        $this->assertDatabaseHas('comments', ['id' => $comment->id, 'body' => 'Updated comment content']);
     }
 
     public function test_guest_cannot_update_comment()
     {
-        $user = User::factory()->create();
-        $article = Article::factory()->create(['user_id' => $user->id]);
-        $comment = Comment::factory()->create([
-            'article_id' => $article->id,
-            'user_id' => $user->id,
-        ]);
+        $comment = Comment::factory()->create();
 
-        $payload = ['body' => 'Attempted update'];
+        $payload = ['body' => 'Updated comment content'];
 
         $response = $this->putJson("/api/comments/{$comment->id}", $payload);
 
-        $response->assertStatus(401); // Unauthorized
+        $response->assertStatus(401); // unauthorized
     }
 
     public function test_other_user_cannot_update_comment()
     {
-        $owner = User::factory()->create();
+        $commentOwner = User::factory()->create();
         $otherUser = User::factory()->create();
-        $article = Article::factory()->create(['user_id' => $owner->id]);
-        $comment = Comment::factory()->create([
-            'article_id' => $article->id,
-            'user_id' => $owner->id,
-            'body' => 'Original comment',
-        ]);
+        $comment = Comment::factory()->create(['user_id' => $commentOwner->id]);
 
-        $payload = ['body' => 'Malicious update'];
+        $payload = ['body' => 'Malicious update attempt'];
 
-        $response = $this
-            ->actingAs($otherUser)
-            ->putJson("/api/comments/{$comment->id}", $payload);
+        $response = $this->actingAs($otherUser)->putJson("/api/comments/{$comment->id}", $payload);
 
-        $response->assertStatus(403); // Forbidden
+        $response->assertStatus(403);
+
+        $this->assertDatabaseMissing('comments', ['id' => $comment->id, 'body' => 'Malicious update attempt']);
     }
 }

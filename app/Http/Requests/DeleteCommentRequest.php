@@ -2,16 +2,18 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Article;
+use App\Models\Comment;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
-class DeleteArticleRequest extends FormRequest
+class DeleteCommentRequest extends FormRequest
 {
-    
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
-        if(!Gate::authorize('delete', $this->route('article'))){
+        if(!Gate::authorize('delete', $this->route('comment'))){
             return false;
         }
         return true;
