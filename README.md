@@ -1,78 +1,105 @@
 # Blog API
 
-A simple RESTful API for a blog platform that allows users to register, log in, manage articles, and post comments.
+A RESTful API for a blogging platform built with Laravel, featuring token-based authentication, article and comment management, and full authorization control.
 
 ## Features
 
--   **User Authentication**: Register, login, and logout using token-based authentication (Sanctum).
--   **Articles**:
-    -   List all articles
-    -   View a specific article with its comments
-    -   Create, update, and delete articles (only by the author)
--   **Comments**:
-    -   List comments for an article
-    -   Add, edit, and delete comments (authenticated users)
--   **Authorization**: Only the owner of an article or comment can edit or delete it.
+- **Authentication** – Token-based auth via Laravel Sanctum (register, login, logout)
+- **Articles** – Create, read, update, and delete articles
+- **Comments** – Comment on articles, with full CRUD support
+- **Authorization** – Users can only edit or delete their own articles and comments, enforced via Laravel Policies
+- **Validation** – Request validation handled through dedicated Form Request classes
+- **Consistent API responses** – Structured JSON output via API Resources
+- **Automated tests** – Feature tests covering authentication, ownership rules, and validation for both articles and comments
 
-## Technologies
+## Tech Stack
 
--   Laravel 10
--   MySQL
--   Laravel Sanctum for authentication
+- **Backend:** PHP, Laravel 12
+- **Authentication:** Laravel Sanctum
+- **Database:** MySQL (SQLite in-memory for automated tests)
+- **Testing:** PHPUnit
 
 ## API Endpoints
 
-### Authentication
-
--   `POST /api/register` – Register a new user
--   `POST /api/login` – Login and receive token
--   `POST /api/logout` – Logout (requires auth token)
+### Auth
+| Method | Endpoint       | Description         | Auth required |
+|--------|----------------|----------------------|----------------|
+| POST   | `/api/register` | Register a new user | No |
+| POST   | `/api/login`     | Log in and receive a token | No |
+| POST   | `/api/logout`    | Revoke the current token | Yes |
 
 ### Articles
-
--   `GET /api/articles` – List all articles
--   `GET /api/articles/{article}` – Get a specific article with comments
--   `POST /api/articles` – Create a new article (requires auth)
--   `PUT /api/articles/{article}` – Update an article (requires auth, owner only)
--   `DELETE /api/articles/{article}` – Delete an article (requires auth, owner only)
+| Method | Endpoint                | Description             | Auth required |
+|--------|--------------------------|--------------------------|----------------|
+| GET    | `/api/articles`          | List all articles        | No |
+| GET    | `/api/articles/{id}`     | Show a single article with its comments | No |
+| POST   | `/api/articles`          | Create an article        | Yes |
+| PUT    | `/api/articles/{id}`     | Update your own article  | Yes (owner only) |
+| DELETE | `/api/articles/{id}`     | Delete your own article  | Yes (owner only) |
 
 ### Comments
-
--   `GET /api/articles/{article}/comments` – List comments of an article
--   `POST /api/articles/{article}/comments` – Add a comment (requires auth)
--   `PUT /api/comments/{comment}` – Update a comment (requires auth, owner only)
--   `DELETE /api/comments/{comment}` – Delete a comment (requires auth, owner only)
+| Method | Endpoint                          | Description             | Auth required |
+|--------|------------------------------------|--------------------------|----------------|
+| GET    | `/api/articles/{id}/comments`     | List comments on an article | No |
+| GET    | `/api/comments/{id}`              | Show a single comment    | No |
+| POST   | `/api/articles/{id}/comments`     | Add a comment to an article | Yes |
+| PUT    | `/api/comments/{id}`              | Update your own comment  | Yes (owner only) |
+| DELETE | `/api/comments/{id}`              | Delete your own comment  | Yes (owner only) |
 
 ## Installation
 
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/shabani17/blog-api.git
-    ```
-2. Install dependencies:
-    ```bash
-    composer install
-    ```
-3. Copy `.env.example` to `.env` and configure your database and other settings:
-    ```bash
-    cp .env.example .env
-    php artisan key:generate
-    ```
-4. Run migrations:
-    ```bash
-    php artisan migrate
-    ```
-5. Start the local server:
-    ```bash
-    php artisan serve
-    ```
+1. Clone the repository
+   ```bash
+   git clone https://github.com/shabani17/blog-api.git
+   cd blog-api
+   ```
+
+2. Install dependencies
+   ```bash
+   composer install
+   ```
+
+3. Set up environment file
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. Configure your database credentials in `.env`
+
+5. Run migrations
+   ```bash
+   php artisan migrate
+   ```
+
+6. Serve the application
+   ```bash
+   php artisan serve
+   ```
 
 ## Running Tests
 
-This project includes automated feature and unit tests to ensure the API works correctly. All tests are located in `tests/Feature` and `tests/Unit`.
-
-Run all tests using:
+The project includes a full suite of feature tests covering authentication, ownership-based authorization, and validation rules. Tests run against an in-memory SQLite database, so no extra setup is needed.
 
 ```bash
 php artisan test
 ```
+
+## Authorization Rules
+
+- Anyone can view articles and comments.
+- Only authenticated users can create articles and comments.
+- Only the original author can update or delete their own article or comment — enforced via `ArticlePolicy` and `CommentPolicy`.
+
+## Project Structure
+
+- `app/Http/Controllers` – Request handling (Auth, Article, Comment)
+- `app/Http/Requests` – Form validation and authorization checks
+- `app/Http/Resources` – JSON response formatting
+- `app/Policies` – Ownership-based authorization rules
+- `app/Models` – Eloquent models (User, Article, Comment)
+- `tests/Feature` – End-to-end API tests
+
+## License
+
+This project is open for educational and portfolio purposes.
